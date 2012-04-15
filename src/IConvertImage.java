@@ -8,8 +8,7 @@ public interface IConvertImage {
 
 	public final String root = "B:/media/image/";
 
-	public final String pathIn = root + "in";
-	public final String pathOut = root + "out/new";
+
 	public final Integer frequency = 1500;
 
 	public final Integer xResolution = 800;
@@ -28,15 +27,13 @@ public interface IConvertImage {
 			+ " -compress JPEG -quality 90 -sampling-factor 2x1 -strip %thumb%";
 
 	/*Noelia */
-	public final String copyrightNoelia = " \"Noelia\" ";
-	public final String annotateNoelia = " -gravity southeast -stroke \"#000C\" -strokewidth 2 -font %font% -pointsize %fontSize% -annotate +10+10  "
+	public final String copyrightNoelia = " \"%copyrigth%\" ";
+	public final String annotateNoelia = " -gravity southeast -stroke \"#000C\" -strokewidth 2 -font %font% -pointsize %fontSize% -annotate +%annotate%+%annotate%  "
 			+ copyrightNoelia
-			+ " -stroke none -fill white -annotate +10+10 "
+			+ " -stroke none -fill white -annotate +%annotate%+%annotate% "
 			+ copyrightNoelia;
 	public final String exeNoelia = " %1 ( +clone -resize %resolution% -auto-orient "
 			+ annotateNoelia
-			+ " -compress JPEG -quality 90 -write %reduced% +delete ) -resize x128 -auto-orient "
-			+ POLOROID
-			+ " -compress JPEG -quality 90 -sampling-factor 2x1 -strip %thumb%";
+			+ " -compress JPEG -quality 90 -write %reduced% +delete )";
 
 }

@@ -20,12 +20,32 @@ public class Main implements IConvertImage {
 		String imageMagick = exe;
 		String font = "Arial";
 		String fontSize = "18";
+		String pathRoot = root;
+		String copyrigth = "Noelia";
+		String annotate = "10";
 
-		if (args.length > 1) {
-			isNoelia = true;
-			font = args[0];
-			fontSize = args[1];
+		if (args.length == 1) {
+
+			pathRoot = args[1];
+
 		}
+
+		if (args.length > 2) {
+			isNoelia = true;
+			int i = 0;
+			pathRoot = args[i];
+			i++;
+			copyrigth = args[i];
+			i++;
+			font = args[i];
+			i++;
+			fontSize = args[i];
+			i++;
+			annotate = args[i];
+		}
+
+		String pathIn = pathRoot + "in";
+		String pathOut = pathRoot + "out/new";
 
 		// liste des fichiers
 		try {
@@ -42,7 +62,7 @@ public class Main implements IConvertImage {
 
 			Iterator<String> iter = list.iterator();
 			while (iter.hasNext()) {
-				String fileName = (String) iter.next().replace("\\", "/");
+				String fileName = iter.next().replace("\\", "/");
 				// B:\media\image\in\cris\22\1024_0000.jpg
 				String fileNameClean = fileName.replace(pathIn, "");
 				String fileOut = pathOut + fileNameClean;
@@ -55,7 +75,8 @@ public class Main implements IConvertImage {
 						"\"" + fileName + "\"").replace("%reduced%",
 						"\"" + fileOut + "\"").replace("%thumb%",
 						"\"" + thumb + "\"").replace("%font%", font).replace(
-						"%fontSize%", fontSize);
+						"%fontSize%", fontSize).replace("%copyrigth%",
+						copyrigth).replace("%annotate%", annotate);
 				// System.out.println(root+"ImageMagick/convert.exe"+bat.replace(root,"").replace("/",
 				// "\\"));
 				try {
@@ -63,8 +84,8 @@ public class Main implements IConvertImage {
 
 					new File(pathOut).delete();
 					new File(thumb).getParentFile().mkdirs();
-					String cmd = root + "ImageMagick/convert.exe"
-							+ bat.replace(root, "").replace("/", "\\");
+					String cmd = pathRoot + "ImageMagick/convert.exe"
+							+ bat.replace(pathRoot, "").replace("/", "\\");
 					r.exec(cmd);
 					System.out.println(cmd);
 					System.out.println(fileName + " traite");
