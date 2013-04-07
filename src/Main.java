@@ -1,7 +1,11 @@
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 
 import com.drew.imaging.jpeg.JpegProcessingException;
 import com.drew.metadata.Directory;
@@ -12,30 +16,79 @@ import com.drew.metadata.exif.ExifReader;
 
 public class Main implements IConvertImage {
 
+	static Mode mode=Mode.NORMAL;
+	static Properties properties;
+	
+	static Boolean isNoelia = false;
+	static String imageMagick = exe;
+	static String font = "Arial";
+	static String fontSize = "18";
+	static String pathRoot = root;
+	static String copyright = "Noelia";
+	static String annotate = "10";
+	
+	static String pathIn;
+	static String pathOut;
+	
+	static public  Integer xResolution = 800;
+	static public  Integer yResolution = 800;
+
+	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Boolean isNoelia = false;
-		String imageMagick = exe;
-		String font = "Arial";
-		String fontSize = "18";
-		String pathRoot = root;
-		String copyrigth = "Noelia";
-		String annotate = "10";
+
 
 		if (args.length == 1) {
 
-			pathRoot = args[1];
+			if(args[0].indexOf(".properties")>-1){
 
-		}
+				mode = Mode.EXTERNAL;
+				properties = new Properties();
 
-		if (args.length > 2) {
+				File prop = new File(args[0]);
+				if (prop.exists()) {
+					try {
+						properties.load(new FileReader(prop));
+						
+						pathRoot = (String) properties.get("pathRoot");
+						
+						copyright =  (String) properties.get("copyright");
+						
+						font = (String) properties.get("font");
+						
+						fontSize = (String) properties.get("fontSize");
+						
+						annotate = ((String) properties.get("annotateSup"));
+						annotate = annotate.replaceAll("%annotate%",(String)properties.get("annotate"));
+						imageMagick = (String) properties.get("exe");
+						xResolution = Integer.valueOf((String) properties.get("xResolution"));
+						yResolution = Integer.valueOf((String) properties.get("yResolution"));
+						
+						
+					} catch (FileNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+				}
+			
+			}
+			else{
+				pathRoot = args[1];	
+			}
+			
+
+		}else if (args.length > 2) {
 			isNoelia = true;
 			int i = 0;
 			pathRoot = args[i];
 			i++;
-			copyrigth = args[i];
+			copyright = args[i];
 			i++;
 			font = args[i];
 			i++;
@@ -44,15 +97,15 @@ public class Main implements IConvertImage {
 			annotate = args[i];
 		}
 
-		String pathIn = pathRoot + "in";
-		String pathOut = pathRoot + "out/new";
+		 pathIn = pathRoot + "in";
+		 pathOut = pathRoot + "out/new";
 
 		// liste des fichiers
 		try {
 
 			if (isNoelia) {
 				imageMagick = exeNoelia;
-			} else {
+			} else if (mode == Mode.NORMAL){
 				imageMagick = exe;
 
 			}
@@ -64,38 +117,11 @@ public class Main implements IConvertImage {
 			while (iter.hasNext()) {
 				String fileName = iter.next().replace("\\", "/");
 				// B:\media\image\in\cris\22\1024_0000.jpg
-				String fileNameClean = fileName.replace(pathIn, "");
-				String fileOut = pathOut + fileNameClean;
-				String nameThumb = new File(fileName).getName();
-				String thumb = pathOut
-						+ fileNameClean.replace(nameThumb, "thumbnail/TN-"
-								+ nameThumb);
-				String bat = imageMagick.replace("%resolution%",
-						readExif(fileName)).replace("%1",
-						"\"" + fileName + "\"").replace("%reduced%",
-						"\"" + fileOut + "\"").replace("%thumb%",
-						"\"" + thumb + "\"").replace("%font%", font).replace(
-						"%fontSize%", fontSize).replace("%copyrigth%",
-						copyrigth).replace("%annotate%", annotate);
-				// System.out.println(root+"ImageMagick/convert.exe"+bat.replace(root,"").replace("/",
-				// "\\"));
-				try {
-					Runtime r = Runtime.getRuntime();
-
-					new File(pathOut).delete();
-					new File(thumb).getParentFile().mkdirs();
-					String cmd = pathRoot + "ImageMagick/convert.exe"
-							+ bat.replace(pathRoot, "").replace("/", "\\");
-					r.exec(cmd);
-					System.out.println(cmd);
-					System.out.println(fileName + " traite");
-					Thread.sleep(frequency);
-					// System.out.println(process.exitValue());
-
-				} catch (Exception e) {
-					// System.out.println("erreur d'execution "+e.getMessage());
-					Thread.sleep(frequency);
-				}
+				
+				normalMode(fileName);
+				
+				
+				
 
 			}
 
@@ -104,6 +130,46 @@ public class Main implements IConvertImage {
 			e.printStackTrace();
 		}
 
+	}
+	
+	private static void normalMode(String fileName) throws InterruptedException{
+		String fileNameClean = fileName.replace(pathIn, "");
+		String fileOut = pathOut + fileNameClean;
+		String nameThumb = new File(fileName).getName();
+		String thumb = pathOut
+				+ fileNameClean.replace(nameThumb, "thumbnail/TN-"
+						+ nameThumb);
+		String bat = imageMagick.replace("%resolution%",
+				readExif(fileName)).replace("%1",
+				"\"" + fileName + "\"").replace("%reduced%",
+				"\"" + fileOut + "\"").replace("%thumb%",
+				"\"" + thumb + "\"").replace("%annotate%", annotate).replace("%font%", font).replace(
+						"%fontSize%", fontSize).replace("%copyright%",
+								copyright);
+		// System.out.println(root+"ImageMagick/convert.exe"+bat.replace(root,"").replace("/",
+		// "\\"));
+		try {
+			Runtime r = Runtime.getRuntime();
+
+			new File(pathOut).delete();
+			new File(thumb).getParentFile().mkdirs();
+			String cmd = pathRoot + "ImageMagick/convert.exe "
+					+ bat.replace(pathRoot, "").replace("/", "\\");
+			Process p =r.exec(cmd);
+			System.out.println(cmd );
+			
+			if (p.exitValue() !=0){
+				System.out.println(fileName + " erreur");
+			}else{
+				System.out.println(fileName + " traite");
+			}
+			Thread.sleep(frequency);
+			// System.out.println(process.exitValue());
+
+		} catch (Exception e) {
+			 System.out.println("erreur d'execution "+e.getMessage());
+			Thread.sleep(frequency);
+		}
 	}
 
 	private static String readExif(String name) {

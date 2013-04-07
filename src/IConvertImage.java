@@ -11,8 +11,7 @@ public interface IConvertImage {
 
 	public final Integer frequency = 1500;
 
-	public final Integer xResolution = 800;
-	public final Integer yResolution = 800;
+
 
 	/* Mes cliches */
 	public final String copyright = " \"copyright cmolla\" ";
@@ -27,7 +26,7 @@ public interface IConvertImage {
 			+ " -compress JPEG -quality 90 -sampling-factor 2x1 -strip %thumb%";
 
 	/*Noelia */
-	public final String copyrightNoelia = " \"%copyrigth%\" ";
+	public final String copyrightNoelia = " \"%copyright%\" ";
 	public final String annotateNoelia = " -gravity southeast -stroke \"#000C\" -strokewidth 2 -font %font% -pointsize %fontSize% -annotate +%annotate%+%annotate%  "
 			+ copyrightNoelia
 			+ " -stroke none -fill white -annotate +%annotate%+%annotate% "

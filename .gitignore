@@ -4,3 +4,5 @@
 /bin/FileUtility.class
 /bin/IConvertImage.class
 /bin/Main.class
+bin/*
+jar-in-jar-loader.zip

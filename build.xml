@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project default="create_run_jar" name="Create Runnable Jar for Project convertImage">
+<project default="create_run_jar" name="Create Runnable Jar for Project malys_convertImage with Jar-in-Jar Loader">
     <!--this file was created by Eclipse Runnable JAR Export Wizard-->
     <!--ANT 1.7 is required                                        -->
     <target name="create_run_jar">
-        <jar destfile="Z:/B/media/image/convertImage.jar" filesetmanifest="mergewithoutmain">
+        <jar destfile="B:/media/image/convertImage.jar">
             <manifest>
-                <attribute name="Main-Class" value="Main"/>
+                <attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
+                <attribute name="Rsrc-Main-Class" value="Main"/>
                 <attribute name="Class-Path" value="."/>
+                <attribute name="Rsrc-Class-Path" value="./ metadata-extractor-2.3.1.jar jmagick.jar"/>
             </manifest>
-            <fileset dir="F:/workspace/convertImage/bin"/>
-            <zipfileset excludes="META-INF/*.SF" src="F:/workspace/convertImage/lib/metadata-extractor-2.3.1.jar"/>
-            <zipfileset excludes="META-INF/*.SF" src="F:/workspace/convertImage/lib/jmagick.jar"/>
+            <zipfileset src="jar-in-jar-loader.zip"/>
+            <fileset dir="B:/prog/code/malys_convertImage/bin"/>
+            <zipfileset dir="B:\prog\code\malys_convertImage\lib" includes="metadata-extractor-2.3.1.jar"/>
+            <zipfileset dir="B:\prog\code\malys_convertImage\lib" includes="jmagick.jar"/>
         </jar>
     </target>
 </project>
